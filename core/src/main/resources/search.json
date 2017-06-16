@@ -1,0 +1,8 @@
+{
+	"port":9195,
+	"indexPath":"tort-index",
+	"shards":"9",
+	"writerModel":true,
+	"maxResult":30,
+    "workers":[]
+}
