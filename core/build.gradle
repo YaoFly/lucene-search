@@ -42,8 +42,8 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-pool2
     compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.4.2'
-
-
+    // https://mvnrepository.com/artifact/org.javassist/javassist
+    compile group: 'org.javassist', name: 'javassist', version: '3.21.0-GA'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
