@@ -332,35 +332,34 @@ class SearchHandler extends SimpleChannelInboundHandler<HttpObject> {
             }catch(Exception e){
                 logger.error("Search thread error.");
             }
+        } else{
+            //参数是检索特定分片,只在本地检索
+            PooledSearcher searcher=SEARCH_GLOBAL.borrowSearcher(shard);
+            RTIndex rtReader=SEARCH_GLOBAL.getShardIndex(shard);
+            ScoreDoc[] partHits=null;
+            try {
+                partHits=searcher.getSearcher().search(keyword);
+            } catch (IOException e) {
+                SEARCH_GLOBAL.returnSearcher(searcher);
+                e.printStackTrace();
+            } catch (ParseException e) {
+                SEARCH_GLOBAL.returnSearcher(searcher);
+                e.printStackTrace();
+            }
+            SEARCH_GLOBAL.returnSearcher(searcher);
+            if(partHits!=null){
+                for(int hit=0;hit<partHits.length;++hit){
+                    String[] ids=rtReader.getID(partHits[hit].doc);
+                    for(String iid:ids){
+                        docs.add(new ClusterResult(
+                                iid,
+                                rtReader.getKeyword(partHits[hit].doc)
+                        ));
+                    }
+
+                }
+            }
         }
-//        else{
-//            //参数是检索特定分片,只在本地检索
-//            PooledImageSearcher searcher=SEARCH_GLOBAL.borrowImageSearcher(shard);
-//            RTIndex rtReader=SEARCH_GLOBAL.getShardIndex(shard);
-//            ImageSearchHits partHits=null;
-//            try {
-//                partHits=searcher.getSearcher().search(feature,tags);
-//            } catch (IOException e) {
-//                SEARCH_GLOBAL.returnImageSearcher(searcher);
-//                e.printStackTrace();
-//            }
-//            SEARCH_GLOBAL.returnImageSearcher(searcher);
-//            if(partHits!=null){
-//                for(int hit=0;hit<partHits.length();++hit){
-//                    String[] ids=rtReader.getID(partHits.documentID(hit));
-//
-//                    for(String iid:ids){
-//                        docs.add(new ClusterResult(
-//                                iid,
-//                                partHits.score(hit),
-//                                rtReader.getTags(partHits.documentID(hit)),
-//                                rtReader.getKeyword(partHits.documentID(hit))
-//                        ));
-//                    }
-//
-//                }
-//            }
-//        }
 
 //        SEARCH_GLOBAL.returnFeature(feature);
 
